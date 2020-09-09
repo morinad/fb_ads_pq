@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{4DF76451-A46A-4C0B-BE03-459FAAFA07E6}") = "FBads", "FBads\FBads.mproj", "{D8260419-E7CE-405B-AD0A-70313A26EC0B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D8260419-E7CE-405B-AD0A-70313A26EC0B}.Debug|x86.ActiveCfg = Debug|x86
+		{D8260419-E7CE-405B-AD0A-70313A26EC0B}.Debug|x86.Build.0 = Debug|x86
+		{D8260419-E7CE-405B-AD0A-70313A26EC0B}.Release|x86.ActiveCfg = Release|x86
+		{D8260419-E7CE-405B-AD0A-70313A26EC0B}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {43FAFB84-5A25-4085-8A80-2C030CE1E7EC}
+	EndGlobalSection
+EndGlobal
