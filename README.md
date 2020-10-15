@@ -16,9 +16,13 @@
 
 ### Полезные ссылки:
 Подробное видео по использованию коннектора: https://youtu.be/B8BWwRFWtOc
+
 Список приложений Facebook Ads: https://developers.facebook.com/apps/
+
 Получение токенов ФБ (маркер доступа): https://developers.facebook.com/tools/explorer/
+
 Отладчик токенов: https://developers.facebook.com/tools/debug/accesstoken/
+
 Токен аккаунта в коде страницы: https://www.facebook.com/ads/manager/account_settings/account_billing/
 
 
