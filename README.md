@@ -14,6 +14,7 @@
 2) Можно создать приложение в Facebook и получить через него.
 Способ 2 неудобен тем, что токен живёт 2-3 месяца, потом его нужно менять.
 
+### Полезные ссылки:
 Подробное видео по использованию коннектора: https://youtu.be/B8BWwRFWtOc
 Список приложений Facebook Ads: https://developers.facebook.com/apps/
 Получение токенов ФБ (маркер доступа): https://developers.facebook.com/tools/explorer/
