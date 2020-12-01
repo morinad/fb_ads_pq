@@ -28,4 +28,6 @@
 
 Токен аккаунта в коде страницы: https://www.facebook.com/ads/manager/account_settings/account_billing/
 
+Обзор API Facebook: https://developers.facebook.com/docs/marketing-apis/overview
+
 
