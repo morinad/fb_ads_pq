@@ -122,7 +122,7 @@ fldSpRes = if report = "campaign" then {"account_id","campaign_name","campaign_i
 
 
 get = [limit=commonLimit, after=aft, #"access_token"=Extension.CurrentCredential()[Key], #"fields"=fld, #"level"=rep, #"time_increment"="1", #"time_range"="{'since':'"&date1&"','until':'"&date2&"'}"],
-web =Function.InvokeAfter(()=> Web.Contents("https://graph.facebook.com/v8.0/", [RelativePath ="act_"&acc&"/insights", Query = get, ManualStatusHandling = {404, 400}]),#duration(0,0,0,commonDelay)),
+web =Function.InvokeAfter(()=> Web.Contents("https://graph.facebook.com/v9.0/", [RelativePath ="act_"&acc&"/insights", Query = get, ManualStatusHandling = {404, 400}]),#duration(0,0,0,commonDelay)),
 result = Json.Document(web),
 dataRes = result[data],
 toTable = Table.FromList(dataRes, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
@@ -159,7 +159,7 @@ nextFunc=
     (aft)=>let
     get = [after = aft, limit = commonLimit, #"access_token"=Extension.CurrentCredential()[Key], 
     #"fields"=fld, #"level"=rep, #"time_increment"="1", #"time_range"="{'since':'"&date1&"','until':'"&date2&"'}"],
-    web = Function.InvokeAfter(()=> Web.Contents("https://graph.facebook.com/v8.0/act_"&acc&"/insights", [Query = get,  ManualStatusHandling = {404, 400}]),#duration(0,0,0,commonDelay)),
+    web = Function.InvokeAfter(()=> Web.Contents("https://graph.facebook.com/v9.0/act_"&acc&"/insights", [Query = get,  ManualStatusHandling = {404, 400}]),#duration(0,0,0,commonDelay)),
     result = Json.Document(web),
     paging = try  Text.AfterDelimiter(result[paging][next],"after=") otherwise null
     in paging,
