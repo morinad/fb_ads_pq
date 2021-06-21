@@ -80,7 +80,7 @@ if (try [data])[Error]?[Message]?=null then "Всё ОК" else (try [data])[Erro
     sort = Table.Sort(added, {{"month", Order.Ascending}}),
     ok = Table.SelectRows(sort, each ([comment] <> "Нет данных"))
 in
-   Table.TransformColumnTypes(ok,{{"comment", type text}});
+   ok;
        
 
 
