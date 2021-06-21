@@ -73,8 +73,14 @@ let
     tipchik = Table.TransformColumnTypes(expa,{{"after", type text}}),
     addData = Table.AddColumn(tipchik, "data", each getFB(account,reportType,commonLimit, commonDelay,[after], [text0], [text1])),
     removeCols = Table.RemoveColumns(addData,{"text0", "text1","after"}),
-    delErrors=Table.RemoveRowsWithErrors(removeCols, {"data"})
-    in delErrors;
+    added = Table.AddColumn(removeCols, "comment", each 
+if (try [data])[Error]?[Message]?="Столбец ""Column1"" таблицы не найден." then "Нет данных" else 
+if (try [data])[Error]?[Message]?=null then "Всё ОК" else (try [data])[Error]?[Detail]?[error]?[message]
+),
+    sort = Table.Sort(added, {{"month", Order.Ascending}}),
+    ok = Table.SelectRows(sort, each ([comment] <> "Нет данных"))
+in
+   Table.TransformColumnTypes(ok,{{"comment", type text}});
        
 
 
