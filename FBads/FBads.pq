@@ -29,6 +29,11 @@ FuncType = type function (
         Documentation.FieldDescription = "Enter the last date of your statistics. You can specify date in YYYY-MM-DD format or use dynamic formats: today, yesterday, 69daysAgo.",
         Documentation.SampleValues = {"yesterday"}
     ]),
+    version as (type text meta [
+        Documentation.FieldCaption = "API version:",
+        Documentation.FieldDescription = "Enter the API version.",
+        Documentation.SampleValues = {"12"}
+    ]),
        limitVar  as (type nullable text meta [
         Documentation.FieldCaption = "Row limit for 1 query:",
         Documentation.FieldDescription = "",
@@ -61,17 +66,17 @@ FuncType = type function (
 
 
 
-FBads.Func =( account as text, reportType as text, start as text, end as text,  limitVar as nullable text,  delayVar as nullable number)=>
+FBads.Func =( account as text, reportType as text, start as text, end as text, version as text,  limitVar as nullable text,  delayVar as nullable number)=>
 let
     commonLimit = if limitVar=null then "150" else limitVar ,
     commonDelay = if delayVar=null then 0.2 else delayVar,
     source = Table.Join(dateTable(dateFunc(start),dateFunc(end),0),"month0",dateTable(dateFunc(start),dateFunc(end),1),"month1"),
     removeMonth = Table.RemoveColumns(source,{"month0"}),
     renameMonth = Table.RenameColumns(removeMonth,{"month1", "month"}),
-    addOff=  Table.AddColumn(renameMonth, "after", each getOffset(account,reportType,commonLimit, commonDelay,[text0], [text1])),
+    addOff=  Table.AddColumn(renameMonth, "after", each getOffset(account,reportType,commonLimit, commonDelay,[text0], [text1], version)),
     expa = Table.ExpandListColumn(addOff, "after"),
     tipchik = Table.TransformColumnTypes(expa,{{"after", type text}}),
-    addData = Table.AddColumn(tipchik, "data", each getFB(account,reportType,commonLimit, commonDelay,[after], [text0], [text1])),
+    addData = Table.AddColumn(tipchik, "data", each getFB(account,reportType,commonLimit, commonDelay,[after], [text0], [text1], version)),
     removeCols = Table.RemoveColumns(addData,{"text0", "text1","after"}),
     added = Table.AddColumn(removeCols, "comment", each 
 if (try [data])[Error]?[Message]?="Столбец ""Column1"" таблицы не найден." then "Нет данных" else 
@@ -110,7 +115,7 @@ in textType;
 
 
 
-getFB=(acc as text,report as text, commonLimit as text, commonDelay as number, aft as text, date1 as text,date2 as text)=> 
+getFB=(acc as text,report as text, commonLimit as text, commonDelay as number, aft as text, date1 as text,date2 as text, version as text)=> 
 let
 rep = if report="group" then "adset" else report,
 
@@ -128,7 +133,7 @@ fldSpRes = if report = "campaign" then {"account_id","campaign_name","campaign_i
 
 
 get = [limit=commonLimit, after=aft, #"access_token"=Extension.CurrentCredential()[Key], #"fields"=fld, #"level"=rep, #"time_increment"="1", #"time_range"="{'since':'"&date1&"','until':'"&date2&"'}"],
-web =Function.InvokeAfter(()=> Web.Contents("https://graph.facebook.com/v11.0/", [RelativePath ="act_"&acc&"/insights", Query = get, ManualStatusHandling = {404, 400}]),#duration(0,0,0,commonDelay)),
+web =Function.InvokeAfter(()=> Web.Contents("https://graph.facebook.com/", [RelativePath ="v" & version &".0/"&"act_"&acc&"/insights", Query = get, ManualStatusHandling = {404, 400}]),#duration(0,0,0,commonDelay)),
 result = Json.Document(web),
 dataRes = result[data],
 toTable = Table.FromList(dataRes, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
@@ -145,7 +150,7 @@ in order;
 
 
 
-getOffset=(acc as text,report as text,commonLimit as text, commonDelay as number, date1 as text,date2 as text)=> 
+getOffset=(acc as text,report as text,commonLimit as text, commonDelay as number, date1 as text,date2 as text, version as text)=> 
 let
 rep = if report="group" then "adset" else report,
 
@@ -165,7 +170,7 @@ nextFunc=
     (aft)=>let
     get = [after = aft, limit = commonLimit, #"access_token"=Extension.CurrentCredential()[Key], 
     #"fields"=fld, #"level"=rep, #"time_increment"="1", #"time_range"="{'since':'"&date1&"','until':'"&date2&"'}"],
-    web = Function.InvokeAfter(()=> Web.Contents("https://graph.facebook.com/v11.0/act_"&acc&"/insights", [Query = get,  ManualStatusHandling = {404, 400}]),#duration(0,0,0,commonDelay)),
+    web = Function.InvokeAfter(()=> Web.Contents("https://graph.facebook.com/v"& version &".0/act_"&acc&"/insights", [Query = get,  ManualStatusHandling = {404, 400}]),#duration(0,0,0,commonDelay)),
     result = Json.Document(web),
     paging = try  Text.AfterDelimiter(result[paging][next],"after=") otherwise null
     in paging,
@@ -185,6 +190,7 @@ FBads = [
         Json.Document(dataSourcePath)[reportType],
         Json.Document(dataSourcePath)[start],
         Json.Document(dataSourcePath)[end],
+        Json.Document(dataSourcePath)[version],
         Json.Document(dataSourcePath)[limitVar]?,
         Json.Document(dataSourcePath)[delayVar]?
         },
