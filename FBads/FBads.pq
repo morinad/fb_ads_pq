@@ -119,17 +119,17 @@ getFB=(acc as text,report as text, commonLimit as text, commonDelay as number, a
 let
 rep = if report="group" then "adset" else report,
 
-fld = if report = "campaign" then "account_id,campaign_name,campaign_id,impressions,clicks,reach,spend,actions" else
-      if report = "group" then "account_id,campaign_name,campaign_id,adset_name,adset_id,impressions,clicks,reach,spend,actions" else
-      if report = "ad" then "account_id,campaign_name,campaign_id,adset_name,adset_id,ad_name,ad_id,impressions,clicks,reach,spend,actions" else "account_id,campaign_name,campaign_id,impressions,clicks,reach,spend,actions",
+fld = if report = "campaign" then "account_id,campaign_name,campaign_id,impressions,inline_link_clicks,reach,spend,actions" else
+      if report = "group" then "account_id,campaign_name,campaign_id,adset_name,adset_id,impressions,inline_link_clicks,reach,spend,actions" else
+      if report = "ad" then "account_id,campaign_name,campaign_id,adset_name,adset_id,ad_name,ad_id,impressions,inline_link_clicks,reach,spend,actions" else "account_id,campaign_name,campaign_id,impressions,inline_link_clicks,reach,spend,actions",
 
-fldSp = if report = "campaign" then {"account_id","campaign_name","campaign_id","impressions","clicks","reach","spend","actions", "date_start"} else
-        if report = "group" then {"account_id","campaign_name","campaign_id","adset_name","adset_id","impressions","clicks","reach","spend","actions", "date_start"} else
-        if report = "ad" then {"account_id","campaign_name","campaign_id","adset_name","adset_id","ad_name","ad_id","impressions","clicks","reach","spend","actions", "date_start"} else {"account_id","campaign_name","campaign_id","impressions","clicks","reach","spend","actions","date_start"},
+fldSp = if report = "campaign" then {"account_id","campaign_name","campaign_id","impressions","inline_link_clicks","reach","spend","actions", "date_start"} else
+        if report = "group" then {"account_id","campaign_name","campaign_id","adset_name","adset_id","impressions","inline_link_clicks","reach","spend","actions", "date_start"} else
+        if report = "ad" then {"account_id","campaign_name","campaign_id","adset_name","adset_id","ad_name","ad_id","impressions","inline_link_clicks","reach","spend","actions", "date_start"} else {"account_id","campaign_name","campaign_id","impressions","inline_link_clicks","reach","spend","actions","date_start"},
 
-fldSpRes = if report = "campaign" then {"account_id","campaign_name","campaign_id","impressions","clicks","reach","spend","actions", "date_start"} else
-        if report = "group" then {"account_id","campaign_name","campaign_id","group_name","group_id","impressions","clicks","reach","spend","actions", "date_start"} else
-        if report = "ad" then {"account_id","campaign_name","campaign_id","group_name","group_id","ad_name","ad_id","impressions","clicks","reach","spend","actions", "date_start"} else {"account_id","campaign_name","campaign_id","impressions","clicks","reach","spend","actions","date_start"},
+fldSpRes = if report = "campaign" then {"account_id","campaign_name","campaign_id","impressions","inline_link_clicks","reach","spend","actions", "date_start"} else
+        if report = "group" then {"account_id","campaign_name","campaign_id","group_name","group_id","impressions","inline_link_clicks","reach","spend","actions", "date_start"} else
+        if report = "ad" then {"account_id","campaign_name","campaign_id","group_name","group_id","ad_name","ad_id","impressions","inline_link_clicks","reach","spend","actions", "date_start"} else {"account_id","campaign_name","campaign_id","impressions","inline_link_clicks","reach","spend","actions","date_start"},
 
 
 get = [limit=commonLimit, after=aft, #"access_token"=Extension.CurrentCredential()[Key], #"fields"=fld, #"level"=rep, #"time_increment"="1", #"time_range"="{'since':'"&date1&"','until':'"&date2&"'}"],
@@ -143,9 +143,9 @@ expand3 = Table.ExpandRecordColumn(expand2, "actions", {"action_type", "value"},
 replaceNull1 = Table.ReplaceValue(expand3,null,"other_actions",Replacer.ReplaceValue,{"action_type"}),
 replaceNull2 = Table.ReplaceValue(replaceNull1,null,"0",Replacer.ReplaceValue,{"value"}),
 pivotCol = Table.Pivot(replaceNull2,  List.Distinct(replaceNull2[action_type]), "action_type", "value"),
-chType = Table.TransformColumnTypes(pivotCol,{{"date_start", type date}, {"account_id", type text}, {"campaign_name", type text}, {"campaign_id", type text}, {"impressions", Int64.Type}, {"clicks", Int64.Type}, {"reach", Int64.Type}}),
+chType = Table.TransformColumnTypes(pivotCol,{{"date_start", type date}, {"account_id", type text}, {"campaign_name", type text}, {"campaign_id", type text}, {"impressions", Int64.Type}, {"inline_link_clicks", Int64.Type}, {"reach", Int64.Type}}),
 transform = Table.TransformColumnTypes(chType, {{"spend", type number}}, "en-AU"),
-order = Table.ReorderColumns(transform,{"date_start", "account_id", "campaign_name", "campaign_id", "impressions", "clicks", "reach", "spend", "link_click", "page_engagement", "post_engagement"})
+order = Table.ReorderColumns(transform,{"date_start", "account_id", "campaign_name", "campaign_id", "impressions", "inline_link_clicks", "reach", "spend", "link_click", "page_engagement", "post_engagement"})
 in order;
 
 
